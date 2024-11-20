@@ -1,0 +1,713 @@
+<html><head><base href="." /></head>
+<style>
+  body {
+    font-family: 'Roboto', Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background: #f9f9f9;
+  }
+
+  .header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 56px;
+    background: white;
+    display: flex;
+    align-items: center;
+    padding: 0 16px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    z-index: 100;
+  }
+
+  .logo {
+    color: #ff0000;
+    font-size: 20px;
+    font-weight: bold;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .main-content {
+    margin-top: 76px;
+    padding: 20px;
+    display: flex;
+    gap: 20px;
+  }
+
+  .sidebar {
+    width: 240px;
+    position: fixed;
+    top: 56px;
+    left: 0;
+    bottom: 0;
+    background: white;
+    padding: 12px 0;
+    overflow-y: auto;
+  }
+
+  .sidebar-item {
+    display: flex;
+    align-items: center;
+    padding: 8px 24px;
+    cursor: pointer;
+    color: #030303;
+    text-decoration: none;
+  }
+
+  .sidebar-item:hover {
+    background: #f2f2f2;
+  }
+
+  .sidebar-item.active {
+    background: #e5e5e5;
+  }
+
+  .content {
+    margin-left: 240px;
+    width: calc(100% - 240px);
+  }
+
+  .upload-container {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+    margin-bottom: 24px;
+  }
+
+  .upload-area {
+    border: 2px dashed #ccc;
+    padding: 20px;
+    text-align: center;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .upload-area:hover {
+    border-color: #065fd4;
+    background: #f8f9fa;
+  }
+
+  #fileInput {
+    display: none;
+  }
+
+  .gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 16px;
+  }
+
+  .video-card {
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.2s;
+  }
+
+  .video-card:hover {
+    transform: translateY(-1px);
+  }
+
+  .thumbnail-container {
+    position: relative;
+    padding-bottom: 56.25%;
+  }
+
+  .thumbnail-container img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .video-info {
+    padding: 12px;
+  }
+
+  .video-title {
+    font-size: 14px;
+    font-weight: 500;
+    margin: 0 0 4px 0;
+    color: #030303;
+  }
+
+  .upload-icon {
+    width: 24px;
+    height: 24px;
+    margin-right: 8px;
+  }
+
+  .hidden {
+    display: none !important;
+  }
+
+  /* Add styles for public tag */
+  .public-tag {
+    background: #065fd4;
+    color: white;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 12px;
+    margin-left: 8px;
+  }
+
+  .image-stats {
+    display: flex;
+    align-items: center;
+    margin-top: 8px;
+    color: #606060;
+    font-size: 12px;
+  }
+
+  .image-stats > div {
+    margin-right: 12px;
+    display: flex;
+    align-items: center;
+  }
+
+  .loading {
+    padding: 20px;
+    text-align: center;
+    color: #606060;
+    font-size: 14px;
+  }
+
+  /* Add this to the existing CSS */
+  .modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.9);
+    z-index: 1000;
+    cursor: pointer;
+  }
+
+  .modal-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    max-width: 95%;
+    max-height: 95vh;
+  }
+
+  .modal-content img {
+    max-width: 100%;
+    max-height: 95vh;
+    object-fit: contain;
+  }
+
+  .close-modal {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    color: white;
+    font-size: 30px;
+    cursor: pointer;
+    background: none;
+    border: none;
+    padding: 10px;
+  }
+
+  /* Add styles for authentication elements */
+  .auth-btn {
+    padding: 8px 16px;
+    background: #065fd4;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+
+  .auth-btn:hover {
+    background: #0356c5;
+  }
+
+  #userInfo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  #logoutBtn {
+    padding: 4px 8px;
+    background: #f2f2f2;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+
+  /* Add modal styles for login/signup */
+  .auth-modal {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    z-index: 1001;
+  }
+
+  .auth-modal input {
+    display: block;
+    margin: 10px 0;
+    padding: 8px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .auth-modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+  }
+</style>
+
+<body>
+  <div class="header">
+    <a href="javascript:void(0)" class="logo">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="#FF0000">
+        <path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/>
+      </svg>
+      DrawTube
+    </a>
+    <div style="margin-left: auto; display: flex; gap: 10px;" id="authContainer">
+      <button id="loginBtn" class="auth-btn">Login</button>
+      <button id="signupBtn" class="auth-btn">Sign Up</button>
+      <div id="userInfo" class="hidden">
+        Welcome, <span id="username"></span>
+        <button id="logoutBtn">Logout</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="sidebar">
+    <div class="sidebar-item active" id="uploadButton">
+      <svg class="upload-icon" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/>
+      </svg>
+      Upload Photos
+    </div>
+    <div class="sidebar-item" id="myPhotosButton">
+      <svg class="upload-icon" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-1 9h-4v4h-2v-4H9V9h4V5h2v4h4v2z"/>
+      </svg>
+      My Photos
+    </div>
+  </div>
+
+  <div class="main-content">
+    <div class="content">
+      <div class="upload-container" id="uploadSection">
+        <div class="upload-area" id="dropZone">
+          <svg class="upload-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#065fd4">
+            <path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/>
+          </svg>
+          <h3>Drag & Drop your photos here</h3>
+          <p>or click to select files</p>
+          <input type="file" id="fileInput" accept="image/*" multiple>
+        </div>
+      </div>
+
+      <div class="gallery" id="imageGallery">
+        <!-- Images will be added here -->
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" id="imageModal">
+    <button class="close-modal">&times;</button>
+    <div class="modal-content">
+      <img id="modalImage" src="" alt="">
+    </div>
+  </div>
+
+  <div class="auth-modal-overlay" id="authOverlay"></div>
+  <div class="auth-modal" id="loginModal">
+    <h2>Login</h2>
+    <input type="text" id="loginUsername" placeholder="Username">
+    <input type="password" id="loginPassword" placeholder="Password">
+    <button class="auth-btn" id="loginSubmit">Login</button>
+  </div>
+  <div class="auth-modal" id="signupModal">
+    <h2>Sign Up</h2>
+    <input type="text" id="signupUsername" placeholder="Username">
+    <input type="password" id="signupPassword" placeholder="Password">
+    <button class="auth-btn" id="signupSubmit">Sign Up</button>
+  </div>
+
+  <script>
+    // Simulate server latency
+    const FAKE_NETWORK_DELAY = 500;
+
+    // Simulate server API calls
+    const server = {
+      async getAllPhotos() {
+        await new Promise(resolve => setTimeout(resolve, FAKE_NETWORK_DELAY));
+        return JSON.parse(localStorage.getItem('sharedPhotos') || '[]');
+      },
+      
+      async uploadPhoto(photoData) {
+        await new Promise(resolve => setTimeout(resolve, FAKE_NETWORK_DELAY));
+        const photos = JSON.parse(localStorage.getItem('sharedPhotos') || '[]');
+        photos.push(photoData);
+        localStorage.setItem('sharedPhotos', JSON.stringify(photos));
+        return photoData;
+      },
+      
+      async deletePhoto(photoId, userId) {
+        await new Promise(resolve => setTimeout(resolve, FAKE_NETWORK_DELAY));
+        let photos = JSON.parse(localStorage.getItem('sharedPhotos') || '[]');
+        photos = photos.filter(photo => !(photo.id === photoId && photo.userId === userId));
+        localStorage.setItem('sharedPhotos', JSON.stringify(photos));
+      },
+
+      async createAccount(username, password) {
+        await new Promise(resolve => setTimeout(resolve, FAKE_NETWORK_DELAY));
+        const accounts = JSON.parse(localStorage.getItem('accounts') || '[]');
+        if (accounts.find(a => a.username === username)) {
+          throw new Error('Username already exists');
+        }
+        const account = { username, password, id: Date.now().toString() };
+        accounts.push(account);
+        localStorage.setItem('accounts', JSON.stringify(accounts));
+        return account;
+      },
+
+      async login(username, password) {
+        await new Promise(resolve => setTimeout(resolve, FAKE_NETWORK_DELAY));
+        const accounts = JSON.parse(localStorage.getItem('accounts') || '[]');
+        const account = accounts.find(a => a.username === username && a.password === password);
+        if (!account) throw new Error('Invalid credentials');
+        return account;
+      },
+
+      getCurrentUser() {
+        return JSON.parse(localStorage.getItem('currentUser'));
+      },
+
+      setCurrentUser(user) {
+        localStorage.setItem('currentUser', JSON.stringify(user));
+      }
+    };
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      const dropZone = document.getElementById('dropZone');
+      const fileInput = document.getElementById('fileInput');
+      const gallery = document.getElementById('imageGallery');
+      const uploadButton = document.getElementById('uploadButton');
+      const myPhotosButton = document.getElementById('myPhotosButton');
+      const uploadSection = document.getElementById('uploadSection');
+      const logo = document.querySelector('.logo');
+      const modal = document.getElementById('imageModal');
+      const closeBtn = document.querySelector('.close-modal');
+
+      // Load initial photos
+      loadAllPhotos();
+
+      // Setup navigation
+      uploadButton.addEventListener('click', () => {
+        uploadButton.classList.add('active');
+        myPhotosButton.classList.remove('active');
+        uploadSection.classList.remove('hidden');
+        loadAllPhotos();
+      });
+
+      myPhotosButton.addEventListener('click', () => {
+        myPhotosButton.classList.add('active');
+        uploadButton.classList.remove('active');
+        uploadSection.classList.add('hidden');
+        loadMyPhotos();
+      });
+
+      logo.href = 'javascript:void(0)'; // Prevent default # behavior
+      logo.addEventListener('click', () => {
+        // Simulate clicking the upload button
+        uploadButton.click();
+      });
+
+      async function loadAllPhotos() {
+        gallery.innerHTML = '<div style="text-align: center;">Loading photos...</div>';
+        const photos = await server.getAllPhotos();
+        displayPhotos(photos);
+      }
+
+      async function loadMyPhotos() {
+        gallery.innerHTML = '<div style="text-align: center;">Loading your photos...</div>';
+        const currentUser = server.getCurrentUser();
+        if (!currentUser) {
+          gallery.innerHTML = '<div style="text-align: center;">Please login to view your photos</div>';
+          return;
+        }
+        const photos = await server.getAllPhotos();
+        const myPhotos = photos.filter(photo => photo.userId === currentUser.id);
+        displayPhotos(myPhotos);
+      }
+
+      function displayPhotos(photos) {
+        gallery.innerHTML = '';
+        photos.forEach(createImageCard);
+      }
+
+      async function deleteImage(imageId) {
+        const currentUser = server.getCurrentUser();
+        if (!currentUser) return;
+        
+        try {
+          await server.deletePhoto(imageId, currentUser.id);
+          loadMyPhotos(); // Reload the current view after deletion
+        } catch (error) {
+          console.error('Failed to delete photo:', error);
+        }
+      }
+
+      function createImageCard(imageData) {
+        const videoCard = document.createElement('div');
+        videoCard.className = 'video-card';
+        
+        const thumbnailContainer = document.createElement('div');
+        thumbnailContainer.className = 'thumbnail-container';
+        
+        const img = document.createElement('img');
+        img.src = imageData.src;
+        img.alt = `User uploaded image - ${imageData.name}`;
+        
+        const videoInfo = document.createElement('div');
+        videoInfo.className = 'video-info';
+        
+        const titleContainer = document.createElement('div');
+        titleContainer.style.display = 'flex';
+        titleContainer.style.alignItems = 'center';
+        
+        const title = document.createElement('h3');
+        title.className = 'video-title';
+        title.textContent = imageData.name;
+        
+        const publicTag = document.createElement('span');
+        publicTag.className = 'public-tag';
+        publicTag.textContent = 'Public';
+        
+        titleContainer.appendChild(title);
+        titleContainer.appendChild(publicTag);
+        
+        const imageStats = document.createElement('div');
+        imageStats.className = 'image-stats';
+        
+        const uploadInfo = document.createElement('div');
+        uploadInfo.textContent = `Uploaded by ${imageData.username} • ${new Date(imageData.uploadTime).toLocaleDateString()}`;
+        imageStats.appendChild(uploadInfo);
+        
+        const currentUser = server.getCurrentUser();
+        if (currentUser && imageData.userId === currentUser.id) {
+          const deleteButton = document.createElement('button');
+          deleteButton.textContent = 'Delete';
+          deleteButton.style.marginLeft = 'auto';
+          deleteButton.onclick = () => deleteImage(imageData.id);
+          imageStats.appendChild(deleteButton);
+        }
+        
+        thumbnailContainer.appendChild(img);
+        videoInfo.appendChild(titleContainer);
+        videoInfo.appendChild(imageStats);
+        videoCard.appendChild(thumbnailContainer);
+        videoCard.appendChild(videoInfo);
+        
+        gallery.appendChild(videoCard);
+
+        img.addEventListener('click', () => openModal(imageData.src, imageData.id));
+      }
+
+      async function handleFiles(files) {
+        const currentUser = server.getCurrentUser();
+        if (!currentUser) {
+          alert('Please login to upload photos');
+          return;
+        }
+
+        for (const file of files) {
+          if (file.type.startsWith('image/')) {
+            const reader = new FileReader();
+            
+            reader.onload = async (e) => {
+              const imageData = {
+                id: Date.now().toString(),
+                src: e.target.result,
+                name: file.name,
+                userId: currentUser.id,
+                username: currentUser.username,
+                uploadTime: new Date().toISOString(),
+                public: true
+              };
+              
+              try {
+                await server.uploadPhoto(imageData);
+                loadAllPhotos();
+              } catch (error) {
+                console.error('Failed to upload photo:', error);
+              }
+            };
+            
+            reader.readAsDataURL(file);
+          }
+        }
+      }
+
+      dropZone.addEventListener('click', () => {
+        fileInput.click();
+      });
+
+      dropZone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        dropZone.style.borderColor = '#065fd4';
+        dropZone.style.background = '#f8f9fa';
+      });
+
+      dropZone.addEventListener('dragleave', (e) => {
+        e.preventDefault();
+        dropZone.style.borderColor = '#ccc';
+        dropZone.style.background = 'white';
+      });
+
+      dropZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        dropZone.style.borderColor = '#ccc';
+        dropZone.style.background = 'white';
+        
+        const files = e.dataTransfer.files;
+        handleFiles(files);
+      });
+
+      fileInput.addEventListener('change', (e) => {
+        const files = e.target.files;
+        handleFiles(files);
+      });
+
+      // Initialize the upload view
+      uploadButton.click();
+
+      // Setup modal close handlers
+      closeBtn.onclick = () => {
+        modal.style.display = 'none';
+        document.body.style.overflow = 'auto';
+      };
+
+      modal.onclick = (e) => {
+        if (e.target === modal) {
+          modal.style.display = 'none';
+          document.body.style.overflow = 'auto';
+        }
+      };
+
+      // Add keyboard support for closing modal
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && modal.style.display === 'block') {
+          modal.style.display = 'none';
+          document.body.style.overflow = 'auto';
+        }
+      });
+
+      // Authentication event handlers
+      const loginBtn = document.getElementById('loginBtn');
+      const signupBtn = document.getElementById('signupBtn');
+      const logoutBtn = document.getElementById('logoutBtn');
+      const authOverlay = document.getElementById('authOverlay');
+      const loginModal = document.getElementById('loginModal');
+      const signupModal = document.getElementById('signupModal');
+      const userInfo = document.getElementById('userInfo');
+      const usernameSpan = document.getElementById('username');
+
+      function updateAuthUI() {
+        const currentUser = server.getCurrentUser();
+        if (currentUser) {
+          loginBtn.classList.add('hidden');
+          signupBtn.classList.add('hidden');
+          userInfo.classList.remove('hidden');
+          usernameSpan.textContent = currentUser.username;
+        } else {
+          loginBtn.classList.remove('hidden');
+          signupBtn.classList.remove('hidden');
+          userInfo.classList.add('hidden');
+        }
+      }
+
+      loginBtn.onclick = () => {
+        loginModal.style.display = 'block';
+        authOverlay.style.display = 'block';
+      };
+
+      signupBtn.onclick = () => {
+        signupModal.style.display = 'block';
+        authOverlay.style.display = 'block';
+      };
+
+      logoutBtn.onclick = () => {
+        server.setCurrentUser(null);
+        updateAuthUI();
+      };
+
+      document.getElementById('loginSubmit').onclick = async () => {
+        const username = document.getElementById('loginUsername').value;
+        const password = document.getElementById('loginPassword').value;
+        try {
+          const user = await server.login(username, password);
+          server.setCurrentUser(user);
+          updateAuthUI();
+          loginModal.style.display = 'none';
+          authOverlay.style.display = 'none';
+        } catch (error) {
+          alert(error.message);
+        }
+      };
+
+      document.getElementById('signupSubmit').onclick = async () => {
+        const username = document.getElementById('signupUsername').value;
+        const password = document.getElementById('signupPassword').value;
+        try {
+          const user = await server.createAccount(username, password);
+          server.setCurrentUser(user);
+          updateAuthUI();
+          signupModal.style.display = 'none';
+          authOverlay.style.display = 'none';
+        } catch (error) {
+          alert(error.message);
+        }
+      };
+
+      authOverlay.onclick = () => {
+        loginModal.style.display = 'none';
+        signupModal.style.display = 'none';
+        authOverlay.style.display = 'none';
+      };
+
+      updateAuthUI();
+    });
+
+    async function openModal(imageSrc, imageId) {
+      const modal = document.getElementById('imageModal');
+      const modalImg = document.getElementById('modalImage');
+      modalImg.src = imageSrc;
+      modal.style.display = 'block';
+      document.body.style.overflow = 'hidden'; // Prevent scrolling when modal is open
+    }
+  </script>
+</body>
+</html>
